@@ -33,17 +33,16 @@ st.markdown(
     @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Poppins:wght@400;500&display=swap');
     html, body, [class*="css"] { font-family: 'Poppins', sans-serif; }
     .stApp { background-color: #FBF8FC; }
-    div.block-container { padding-top: 1.8rem; padding-bottom: 2rem; }
-    h1, h2, h3 { color: #6B4E7D; font-family: 'Cormorant Garamond', serif; font-weight: 600; }
-    h2 { font-size: 1.6rem; }
-    .terapia-nombre { font-family: 'Cormorant Garamond', serif; }
+    div.block-container { padding-top: 3.2rem; padding-bottom: 2rem; }
+    h1, h2, h3 { color: #6B4E7D; font-family: 'Cormorant Garamond', serif !important; font-weight: 600; }
+    h2 { font-size: 1.4rem; }
     div[data-testid="stImage"] { margin-bottom: -1rem; }
     div[data-testid="stVerticalBlockBorderWrapper"] > div:first-child {
         padding: 0.6rem 1rem !important;
     }
     div[data-testid="stVerticalBlock"] { gap: 0.5rem; }
-    .terapia-nombre { font-size: 1.05rem; font-weight: 700; color: #6B4E7D; margin: 0; }
-    .terapia-detalle { font-size: 0.85rem; color: #4A3B57; margin: 0; }
+    .terapia-nombre { font-family: 'Cormorant Garamond', serif; font-size: 1.25rem; font-weight: 700; color: #6B4E7D; margin: 0; }
+    .terapia-detalle { font-size: 0.8rem; color: #4A3B57; margin: 0; }
     div.stButton > button {
         background-color: #8E6FA1; color: white; border: none; border-radius: 8px;
         padding: 0.3rem 0.9rem;
@@ -73,7 +72,7 @@ def reiniciar():
 
 # ---------- Paso 1: elegir terapia ----------
 if st.session_state.step == 1:
-    st.markdown('<h2>Elegí tu terapia</h2>', unsafe_allow_html=True)
+    st.markdown('<h2>Seleccioná tu terapia</h2>', unsafe_allow_html=True)
     for key, t in TERAPIAS.items():
         with st.container(border=True):
             c1, c2 = st.columns([3, 1])
