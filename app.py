@@ -1,3 +1,4 @@
+import base64
 import streamlit as st
 from datetime import datetime, timedelta
 
@@ -23,7 +24,18 @@ def formatear_hora(dt):
     return dt.strftime("%H:%M")
 
 
-st.set_page_config(page_title="Renacer Holístico – Reservá tu turno", page_icon="assets/logo.png", layout="centered")
+st.set_page_config(
+    page_title="Renacer Holístico – Reservá tu turno",
+    page_icon="assets/logo.png",
+    layout="centered",
+    initial_sidebar_state="collapsed",
+)
+
+
+@st.cache_data
+def _logo_base64():
+    with open("assets/logo.png", "rb") as f:
+        return base64.b64encode(f.read()).decode()
 
 backends = get_backends(to_dict(st.secrets))
 
@@ -35,14 +47,14 @@ st.markdown(
     .stApp { background-color: #FBF8FC; }
     div.block-container { padding-top: 3.2rem; padding-bottom: 2rem; }
     h1, h2, h3 { color: #6B4E7D; font-family: 'Cormorant Garamond', serif !important; font-weight: 600; }
-    h2 { font-size: 1.4rem; }
-    div[data-testid="stImage"] { margin-bottom: -1rem; }
+    h2 { font-size: 1.2rem; }
+    .logo-renacer { display: block; margin: 0 auto -1rem auto; width: 150px; height: auto; }
     div[data-testid="stVerticalBlockBorderWrapper"] > div:first-child {
         padding: 0.6rem 1rem !important;
     }
     div[data-testid="stVerticalBlock"] { gap: 0.5rem; }
-    .terapia-nombre { font-family: 'Cormorant Garamond', serif; font-size: 1.45rem; font-weight: 700; color: #6B4E7D; margin: 0; }
-    .terapia-detalle { font-size: 0.75rem; color: #4A3B57; margin: 0; }
+    .terapia-nombre { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 700; color: #6B4E7D; margin: 0; }
+    .terapia-detalle { font-size: 0.7rem; color: #4A3B57; margin: 0; }
     div.stButton > button {
         background-color: #8E6FA1; color: white; border: none; border-radius: 8px;
         padding: 0.3rem 0.9rem;
@@ -53,9 +65,10 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-col1, col2, col3 = st.columns([1.4, 1, 1.4])
-with col2:
-    st.image("assets/logo.png", width=150)
+st.markdown(
+    f'<img class="logo-renacer" src="data:image/png;base64,{_logo_base64()}">',
+    unsafe_allow_html=True,
+)
 
 if backends.demo_mode:
     st.info("Modo demo: todavía no está conectado a Google Calendar/Sheets reales. Las reservas se guardan localmente para poder probar el flujo.")
