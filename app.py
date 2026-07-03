@@ -3,10 +3,11 @@ import streamlit as st
 from datetime import datetime, timedelta
 
 from config_terapias import (
-    TERAPIAS, DATOS_PAGO, POLITICA_CANCELACION, HORIZONTE_DIAS, NOTIFICACION_EMAIL,
+    POLITICA_CANCELACION, HORIZONTE_DIAS, NOTIFICACION_EMAIL,
 )
 from services.slots import generar_turnos_disponibles, agrupar_por_dia
 from services.bootstrap import get_backends
+from services.config_loader import cargar_terapias_y_pago
 from services.secrets_utils import to_dict
 
 DIAS_ES = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
@@ -38,6 +39,7 @@ def _logo_base64():
         return base64.b64encode(f.read()).decode()
 
 backends = get_backends(to_dict(st.secrets))
+TERAPIAS, DATOS_PAGO = cargar_terapias_y_pago(backends)
 
 st.markdown(
     """

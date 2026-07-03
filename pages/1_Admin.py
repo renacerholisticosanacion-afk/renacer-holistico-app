@@ -1,7 +1,9 @@
 import streamlit as st
 from datetime import datetime, date, time
 
+from config_terapias import TERAPIAS as TERAPIAS_BASE
 from services.bootstrap import get_backends
+from services.config_loader import cargar_terapias_y_pago
 from services.secrets_utils import to_dict
 
 st.set_page_config(page_title="Admin – Renacer Holístico", page_icon="assets/logo.png", layout="wide")
@@ -28,6 +30,38 @@ st.title("Panel de administración")
 if backends.demo_mode:
     st.info("Modo demo: datos guardados localmente, todavía no conectado a Google.")
 
+terapias_actuales, datos_pago_actuales = cargar_terapias_y_pago(backends)
+
+st.subheader("Precios de las terapias")
+with st.form("precios_form"):
+    nuevos_precios = {}
+    for key, t in TERAPIAS_BASE.items():
+        nuevos_precios[key] = st.number_input(
+            t["nombre"], min_value=0, step=1000,
+            value=int(terapias_actuales[key]["precio"]),
+            key=f"precio_{key}",
+        )
+    guardar_precios = st.form_submit_button("Guardar precios")
+
+if guardar_precios:
+    backends.config.set("precios", nuevos_precios)
+    st.success("Precios actualizados.")
+    st.rerun()
+
+st.divider()
+st.subheader("Datos bancarios")
+with st.form("datos_pago_form"):
+    alias = st.text_input("Alias", value=datos_pago_actuales["alias"])
+    banco = st.text_input("Banco", value=datos_pago_actuales["banco"])
+    nota_exterior = st.text_area("Nota para pagos desde el exterior", value=datos_pago_actuales["nota_exterior"])
+    guardar_datos_pago = st.form_submit_button("Guardar datos bancarios")
+
+if guardar_datos_pago:
+    backends.config.set("datos_pago", {"alias": alias, "banco": banco, "nota_exterior": nota_exterior})
+    st.success("Datos bancarios actualizados.")
+    st.rerun()
+
+st.divider()
 st.subheader("Bloqueo manual de agenda")
 with st.form("bloqueo_manual"):
     c1, c2, c3 = st.columns(3)
