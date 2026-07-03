@@ -3,6 +3,9 @@ import json
 import os
 import uuid
 from datetime import datetime
+from zoneinfo import ZoneInfo
+
+TZ_ARGENTINA = ZoneInfo("America/Argentina/Buenos_Aires")
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
 EVENTS_FILE = os.path.join(DATA_DIR, "calendar_events.json")
@@ -68,17 +71,19 @@ class GoogleCalendarBackend:
         self.calendar_id = calendar_id
 
     def get_busy_intervals(self, desde, hasta):
+        desde_tz = desde if desde.tzinfo else desde.replace(tzinfo=TZ_ARGENTINA)
+        hasta_tz = hasta if hasta.tzinfo else hasta.replace(tzinfo=TZ_ARGENTINA)
         body = {
-            "timeMin": desde.isoformat() + "Z" if desde.tzinfo is None else desde.isoformat(),
-            "timeMax": hasta.isoformat() + "Z" if hasta.tzinfo is None else hasta.isoformat(),
+            "timeMin": desde_tz.isoformat(),
+            "timeMax": hasta_tz.isoformat(),
             "items": [{"id": self.calendar_id}],
         }
         resp = self.service.freebusy().query(body=body).execute()
         busy = resp["calendars"][self.calendar_id]["busy"]
         intervalos = []
         for b in busy:
-            inicio = datetime.fromisoformat(b["start"].replace("Z", "+00:00")).replace(tzinfo=None)
-            fin = datetime.fromisoformat(b["end"].replace("Z", "+00:00")).replace(tzinfo=None)
+            inicio = datetime.fromisoformat(b["start"]).astimezone(TZ_ARGENTINA).replace(tzinfo=None)
+            fin = datetime.fromisoformat(b["end"]).astimezone(TZ_ARGENTINA).replace(tzinfo=None)
             intervalos.append((inicio, fin))
         return intervalos
 
