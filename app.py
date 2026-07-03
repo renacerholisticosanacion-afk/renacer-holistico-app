@@ -47,17 +47,17 @@ st.markdown(
     .stApp { background-color: #FBF8FC; }
     div.block-container { padding-top: 3.2rem; padding-bottom: 2rem; }
     h1, h2, h3 { color: #6B4E7D; font-family: 'Cormorant Garamond', serif !important; font-weight: 600; }
-    h2 { font-size: 1.15rem !important; }
+    h2 { font-size: 1.25rem !important; }
     .logo-renacer { display: block; margin: 0 auto -1rem auto; width: 150px; height: auto; }
     div[data-testid="stVerticalBlockBorderWrapper"] > div:first-child {
-        padding: 0.6rem 1rem !important;
+        padding: 0.45rem 0.8rem !important;
     }
     div[data-testid="stVerticalBlock"] { gap: 0.5rem; }
-    .terapia-nombre { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem !important; font-weight: 700; color: #6B4E7D; margin: 0; }
+    .terapia-nombre { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem !important; font-weight: 700; color: #6B4E7D; margin: 0; }
     .terapia-detalle { font-size: 0.7rem !important; color: #4A3B57; margin: 0; }
     div.stButton > button {
-        background-color: #8E6FA1; color: white; border: none; border-radius: 8px;
-        padding: 0.3rem 0.9rem;
+        background-color: #8E6FA1; color: white; border: none; border-radius: 5px;
+        padding: 0.3rem 1.1rem;
     }
     div.stButton > button:hover { background-color: #6B4E7D; color: white; }
     </style>
