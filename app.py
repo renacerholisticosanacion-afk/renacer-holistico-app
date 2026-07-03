@@ -30,10 +30,23 @@ backends = get_backends(to_dict(st.secrets))
 st.markdown(
     """
     <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Poppins:wght@400;500&display=swap');
+    html, body, [class*="css"] { font-family: 'Poppins', sans-serif; }
     .stApp { background-color: #FBF8FC; }
-    h1, h2, h3 { color: #6B4E7D; }
+    div.block-container { padding-top: 1.8rem; padding-bottom: 2rem; }
+    h1, h2, h3 { color: #6B4E7D; font-family: 'Cormorant Garamond', serif; font-weight: 600; }
+    h2 { font-size: 1.6rem; }
+    .terapia-nombre { font-family: 'Cormorant Garamond', serif; }
+    div[data-testid="stImage"] { margin-bottom: -1rem; }
+    div[data-testid="stVerticalBlockBorderWrapper"] > div:first-child {
+        padding: 0.6rem 1rem !important;
+    }
+    div[data-testid="stVerticalBlock"] { gap: 0.5rem; }
+    .terapia-nombre { font-size: 1.05rem; font-weight: 700; color: #6B4E7D; margin: 0; }
+    .terapia-detalle { font-size: 0.85rem; color: #4A3B57; margin: 0; }
     div.stButton > button {
         background-color: #8E6FA1; color: white; border: none; border-radius: 8px;
+        padding: 0.3rem 0.9rem;
     }
     div.stButton > button:hover { background-color: #6B4E7D; color: white; }
     </style>
@@ -41,9 +54,9 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-col1, col2, col3 = st.columns([1, 1, 1])
+col1, col2, col3 = st.columns([1.4, 1, 1.4])
 with col2:
-    st.image("assets/logo.png", use_container_width=True)
+    st.image("assets/logo.png", width=150)
 
 if backends.demo_mode:
     st.info("Modo demo: todavía no está conectado a Google Calendar/Sheets reales. Las reservas se guardan localmente para poder probar el flujo.")
@@ -60,13 +73,17 @@ def reiniciar():
 
 # ---------- Paso 1: elegir terapia ----------
 if st.session_state.step == 1:
-    st.header("Elegí tu terapia")
+    st.markdown('<h2>Elegí tu terapia</h2>', unsafe_allow_html=True)
     for key, t in TERAPIAS.items():
         with st.container(border=True):
             c1, c2 = st.columns([3, 1])
             with c1:
-                st.subheader(t["nombre"])
-                st.write(f"Duración: {t['duracion_min']} min · Precio: ${t['precio']:,.0f}".replace(",", "."))
+                st.markdown(f'<p class="terapia-nombre">{t["nombre"]}</p>', unsafe_allow_html=True)
+                precio_fmt = f"{t['precio']:,.0f}".replace(",", ".")
+                st.markdown(
+                    f'<p class="terapia-detalle">Duración: {t["duracion_min"]} min · Precio: ${precio_fmt}</p>',
+                    unsafe_allow_html=True,
+                )
             with c2:
                 if st.button("Reservar", key=f"elegir_{key}"):
                     st.session_state.terapia_key = key
