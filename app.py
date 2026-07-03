@@ -41,8 +41,8 @@ st.markdown(
         padding: 0.6rem 1rem !important;
     }
     div[data-testid="stVerticalBlock"] { gap: 0.5rem; }
-    .terapia-nombre { font-family: 'Cormorant Garamond', serif; font-size: 1.25rem; font-weight: 700; color: #6B4E7D; margin: 0; }
-    .terapia-detalle { font-size: 0.8rem; color: #4A3B57; margin: 0; }
+    .terapia-nombre { font-family: 'Cormorant Garamond', serif; font-size: 1.45rem; font-weight: 700; color: #6B4E7D; margin: 0; }
+    .terapia-detalle { font-size: 0.75rem; color: #4A3B57; margin: 0; }
     div.stButton > button {
         background-color: #8E6FA1; color: white; border: none; border-radius: 8px;
         padding: 0.3rem 0.9rem;
