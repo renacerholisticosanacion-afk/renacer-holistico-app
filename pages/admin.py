@@ -2,11 +2,10 @@ import streamlit as st
 from datetime import datetime, date, time
 
 from config_terapias import TERAPIAS as TERAPIAS_BASE
+from config_productos import generar_key
 from services.bootstrap import get_backends
-from services.config_loader import cargar_terapias_y_pago
+from services.config_loader import cargar_terapias_y_pago, cargar_productos, guardar_productos
 from services.secrets_utils import to_dict
-
-st.set_page_config(page_title="Admin – Renacer Holístico", page_icon="assets/logo.png", layout="wide")
 
 secrets = to_dict(st.secrets)
 backends = get_backends(secrets)
@@ -62,6 +61,68 @@ if guardar_datos_pago:
     st.rerun()
 
 st.divider()
+st.subheader("Productos (tinturas)")
+
+catalogo_productos = cargar_productos(backends)
+
+with st.expander("Agregar producto nuevo"):
+    with st.form("nuevo_producto_form", clear_on_submit=True):
+        nombre_nuevo = st.text_input("Nombre (podés incluir un emoji, ej: 💤 Sueño reparador)")
+        plantas_nuevo = st.text_input("Plantas (ej: Valeriana + Pasiflora + Melisa)")
+        uso_nuevo = st.text_area("Uso / para qué sirve")
+        ideal_para_nuevo = st.text_input("Ideal para (opcional)")
+        precio_nuevo = st.number_input("Precio", min_value=0, step=1000, key="precio_nuevo_prod")
+        stock_nuevo = st.number_input("Stock inicial", min_value=0, step=1, key="stock_nuevo_prod")
+        crear_producto = st.form_submit_button("Agregar producto")
+
+    if crear_producto:
+        if not nombre_nuevo:
+            st.error("Ingresá un nombre para el producto.")
+        else:
+            nueva_key = generar_key(catalogo_productos, nombre_nuevo)
+            catalogo_productos[nueva_key] = {
+                "nombre": nombre_nuevo,
+                "plantas": plantas_nuevo,
+                "uso": uso_nuevo,
+                "ideal_para": ideal_para_nuevo,
+                "precio": precio_nuevo,
+                "stock": stock_nuevo,
+            }
+            guardar_productos(backends, catalogo_productos)
+            st.success(f"'{nombre_nuevo}' agregado al catálogo.")
+            st.rerun()
+
+for key, p in catalogo_productos.items():
+    with st.expander(p["nombre"]):
+        with st.form(f"editar_producto_{key}"):
+            nombre_ed = st.text_input("Nombre", value=p["nombre"], key=f"nombre_ed_{key}")
+            plantas_ed = st.text_input("Plantas", value=p.get("plantas", ""), key=f"plantas_ed_{key}")
+            uso_ed = st.text_area("Uso / para qué sirve", value=p.get("uso", ""), key=f"uso_ed_{key}")
+            ideal_para_ed = st.text_input("Ideal para", value=p.get("ideal_para", ""), key=f"ideal_ed_{key}")
+            precio_ed = st.number_input("Precio", min_value=0, step=1000, value=int(p["precio"]), key=f"precio_ed_{key}")
+            stock_ed = st.number_input("Stock", min_value=0, step=1, value=int(p["stock"]), key=f"stock_ed_{key}")
+            col_a, col_b = st.columns(2)
+            with col_a:
+                guardar_producto = st.form_submit_button("Guardar cambios")
+            with col_b:
+                eliminar_producto = st.form_submit_button("Eliminar producto")
+
+        if guardar_producto:
+            catalogo_productos[key] = {
+                "nombre": nombre_ed, "plantas": plantas_ed, "uso": uso_ed,
+                "ideal_para": ideal_para_ed, "precio": precio_ed, "stock": stock_ed,
+            }
+            guardar_productos(backends, catalogo_productos)
+            st.success("Producto actualizado.")
+            st.rerun()
+
+        if eliminar_producto:
+            del catalogo_productos[key]
+            guardar_productos(backends, catalogo_productos)
+            st.success("Producto eliminado.")
+            st.rerun()
+
+st.divider()
 st.subheader("Bloqueo manual de agenda")
 with st.form("bloqueo_manual"):
     c1, c2, c3 = st.columns(3)
@@ -110,7 +171,7 @@ st.subheader("Turnos y bloqueos")
 bookings = backends.storage.list_bookings()
 bookings = sorted(bookings, key=lambda b: b.get("inicio", ""))
 
-filtro = st.selectbox("Filtrar por estado", ["Todos", "Pendiente pago", "Pagado", "Cancelado", "Bloqueado"])
+filtro = st.selectbox("Filtrar por estado", ["Todos", "Pendiente pago", "Pagado", "Cancelado", "Bloqueado"], key="filtro_turnos")
 if filtro != "Todos":
     bookings = [b for b in bookings if b.get("estado") == filtro]
 
@@ -152,4 +213,56 @@ for b in bookings:
                 if st.button("Liberar bloqueo", key=f"desbloquear_{b['id']}"):
                     backends.calendar.delete_event(b["calendar_event_id"])
                     backends.storage.update_booking(b["id"], {"estado": "Cancelado"})
+                    st.rerun()
+
+st.divider()
+st.subheader("Pedidos")
+
+orders = backends.orders.list_orders()
+orders = sorted(orders, key=lambda o: o.get("creado", ""))
+
+filtro_pedidos = st.selectbox("Filtrar por estado", ["Todos", "Pendiente pago", "Pagado", "Cancelado"], key="filtro_pedidos")
+if filtro_pedidos != "Todos":
+    orders = [o for o in orders if o.get("estado") == filtro_pedidos]
+
+if not orders:
+    st.write("No hay pedidos para este filtro.")
+
+
+def _restaurar_stock(producto_key, cantidad):
+    catalogo_actual = cargar_productos(backends)
+    if producto_key not in catalogo_actual:
+        return
+    catalogo_actual[producto_key]["stock"] += cantidad
+    guardar_productos(backends, catalogo_actual)
+
+
+for o in orders:
+    with st.container(border=True):
+        col1, col2 = st.columns([3, 2])
+        with col1:
+            st.write(f"**{o['producto_nombre']}** x{o['cantidad']}")
+            if o.get("nombre"):
+                st.write(f"{o['nombre']} · {o.get('telefono', '')} · {o.get('email', '')}")
+            if o.get("precio_total"):
+                st.write(f"Total: ${int(o['precio_total']):,.0f}".replace(",", "."))
+            if o.get("notas"):
+                st.caption(o["notas"])
+            st.write(f"Estado: **{o['estado']}**")
+        with col2:
+            if o["estado"] == "Pendiente pago":
+                cc1, cc2 = st.columns(2)
+                with cc1:
+                    if st.button("Marcar pagado", key=f"pagar_pedido_{o['id']}"):
+                        backends.orders.update_order(o["id"], {"estado": "Pagado"})
+                        st.rerun()
+                with cc2:
+                    if st.button("Cancelar pedido", key=f"cancelar_pedido_{o['id']}"):
+                        backends.orders.update_order(o["id"], {"estado": "Cancelado"})
+                        _restaurar_stock(o["producto_key"], int(o["cantidad"]))
+                        st.rerun()
+            elif o["estado"] == "Pagado":
+                if st.button("Cancelar pedido", key=f"cancelar_pedido_{o['id']}"):
+                    backends.orders.update_order(o["id"], {"estado": "Cancelado"})
+                    _restaurar_stock(o["producto_key"], int(o["cantidad"]))
                     st.rerun()

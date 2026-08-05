@@ -2,11 +2,14 @@
 from collections import namedtuple
 
 from services.calendar_backend import LocalCalendarBackend, GoogleCalendarBackend
-from services.storage_backend import LocalJSONStorage, GoogleSheetsStorage
+from services.storage_backend import (
+    LocalJSONStorage, GoogleSheetsStorage,
+    LocalJSONOrdersStorage, GoogleSheetsOrdersStorage,
+)
 from services.config_backend import LocalJSONConfigStorage, GoogleSheetsConfigStorage
 from services.notifications import LocalNotifier, GmailNotifier
 
-Backends = namedtuple("Backends", ["calendar", "storage", "config", "notifier", "demo_mode"])
+Backends = namedtuple("Backends", ["calendar", "storage", "orders", "config", "notifier", "demo_mode"])
 
 _cache = {}
 
@@ -18,16 +21,21 @@ def get_backends(secrets):
     tiene_google = "gcp_service_account" in secrets and "google_calendar_id" in secrets and "google_sheet_key" in secrets
 
     if tiene_google:
-        calendar, storage, config = _build_google_backends(secrets)
+        calendar, storage, orders, config = _build_google_backends(secrets)
     else:
-        calendar, storage, config = LocalCalendarBackend(), LocalJSONStorage(), LocalJSONConfigStorage()
+        calendar, storage, orders, config = (
+            LocalCalendarBackend(), LocalJSONStorage(), LocalJSONOrdersStorage(), LocalJSONConfigStorage(),
+        )
 
     if "gmail_remitente" in secrets and "gmail_app_password" in secrets:
         notifier = GmailNotifier(secrets["gmail_remitente"], secrets["gmail_app_password"])
     else:
         notifier = LocalNotifier()
 
-    backends = Backends(calendar=calendar, storage=storage, config=config, notifier=notifier, demo_mode=not tiene_google)
+    backends = Backends(
+        calendar=calendar, storage=storage, orders=orders, config=config,
+        notifier=notifier, demo_mode=not tiene_google,
+    )
     _cache["backends"] = backends
     return backends
 
@@ -49,6 +57,7 @@ def _build_google_backends(secrets):
 
     gc = gspread.authorize(creds)
     storage = GoogleSheetsStorage(gc, secrets["google_sheet_key"])
+    orders = GoogleSheetsOrdersStorage(gc, secrets["google_sheet_key"])
     config = GoogleSheetsConfigStorage(gc, secrets["google_sheet_key"])
 
-    return calendar, storage, config
+    return calendar, storage, orders, config

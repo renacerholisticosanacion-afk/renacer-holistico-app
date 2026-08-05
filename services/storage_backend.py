@@ -9,8 +9,15 @@ CAMPOS = [
     "calendar_event_id", "notas", "creado",
 ]
 
+CAMPOS_PEDIDOS = [
+    "id", "tipo", "producto_key", "producto_nombre", "cantidad",
+    "precio_unitario", "precio_total", "nombre", "telefono", "email",
+    "estado", "notas", "creado",
+]
+
 DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
 BOOKINGS_FILE = os.path.join(DATA_DIR, "bookings.json")
+ORDERS_FILE = os.path.join(DATA_DIR, "orders.json")
 
 
 class LocalJSONStorage:
@@ -48,6 +55,78 @@ class LocalJSONStorage:
                 r.update(fields)
                 break
         self._escribir(registros)
+
+
+class LocalJSONOrdersStorage:
+    """Guarda los pedidos de productos en un archivo JSON local. Solo para desarrollo/demo."""
+
+    def __init__(self):
+        os.makedirs(DATA_DIR, exist_ok=True)
+
+    def _leer(self):
+        try:
+            with open(ORDERS_FILE, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            return []
+
+    def _escribir(self, registros):
+        with open(ORDERS_FILE, "w", encoding="utf-8") as f:
+            json.dump(registros, f, ensure_ascii=False, indent=2)
+
+    def add_order(self, record):
+        registros = self._leer()
+        record = dict(record)
+        record["id"] = record.get("id") or str(uuid.uuid4())
+        registros.append(record)
+        self._escribir(registros)
+        return record["id"]
+
+    def list_orders(self):
+        return self._leer()
+
+    def update_order(self, order_id, fields):
+        registros = self._leer()
+        for r in registros:
+            if r["id"] == order_id:
+                r.update(fields)
+                break
+        self._escribir(registros)
+
+
+class GoogleSheetsOrdersStorage:
+    """Guarda los pedidos de productos en una Google Sheet compartida."""
+
+    def __init__(self, gspread_client, sheet_key, worksheet_name="Pedidos"):
+        sheet = gspread_client.open_by_key(sheet_key)
+        try:
+            self.ws = sheet.worksheet(worksheet_name)
+        except Exception:
+            self.ws = sheet.add_worksheet(title=worksheet_name, rows=1000, cols=len(CAMPOS_PEDIDOS))
+            self.ws.append_row(CAMPOS_PEDIDOS)
+
+    def add_order(self, record):
+        record = dict(record)
+        record["id"] = record.get("id") or str(uuid.uuid4())
+        fila = [str(record.get(campo, "")) for campo in CAMPOS_PEDIDOS]
+        self.ws.append_row(fila)
+        return record["id"]
+
+    def list_orders(self):
+        return self.ws.get_all_records()
+
+    def update_order(self, order_id, fields):
+        celdas = self.ws.findall(order_id)
+        for celda in celdas:
+            fila = celda.row
+            encabezados = self.ws.row_values(1)
+            if encabezados[celda.col - 1] != "id":
+                continue
+            for campo, valor in fields.items():
+                if campo in encabezados:
+                    col = encabezados.index(campo) + 1
+                    self.ws.update_cell(fila, col, str(valor))
+            break
 
 
 class GoogleSheetsStorage:
