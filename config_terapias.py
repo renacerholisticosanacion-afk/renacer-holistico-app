@@ -41,6 +41,17 @@ TERAPIAS = {
             "Dentro de las 24 hs siguientes vas a recibir un informe escrito."
         ),
     },
+    "registros_akashicos": {
+        "nombre": "Registros Akáshicos",
+        "grupo": GRUPO_DISTANCIA,
+        "duracion_min": 60,
+        "precio": 40000,
+        "min_dias": 4,
+        "mensaje_confirmacion": (
+            "Unos minutos antes de tu sesión te voy a escribir para avisarte que comienzo. "
+            "Dentro de las 24 hs siguientes vas a recibir un informe escrito."
+        ),
+    },
     "tarot": {
         "nombre": "Tarot Evolutivo",
         "grupo": GRUPO_ENTREGA,
