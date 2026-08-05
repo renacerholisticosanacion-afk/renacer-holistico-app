@@ -13,7 +13,8 @@ TERAPIAS = {
         "min_dias": 7,
         "mensaje_confirmacion": (
             "Unos minutos antes de tu sesión te voy a contactar para enviarte el link de Meet. "
-            "Antes de la sesión vas a recibir un formulario para completar."
+            "Necesito que completes lo antes posible este form para preparar tu sesión: "
+            "https://docs.google.com/forms/d/e/1FAIpQLSfF0qjhgWXp2sO_E-WXyC2WLBUOY8J5qY4pnB_146LlAkjx_w/viewform?usp=header"
         ),
     },
     "reiki": {
