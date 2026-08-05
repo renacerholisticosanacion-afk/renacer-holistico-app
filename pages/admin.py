@@ -34,7 +34,7 @@ terapias_actuales, datos_pago_actuales = cargar_terapias_y_pago(backends)
 st.subheader("Precios de las terapias")
 with st.form("precios_form"):
     nuevos_precios = {}
-    for key, t in TERAPIAS_BASE.items():
+    for key, t in sorted(TERAPIAS_BASE.items(), key=lambda kv: kv[1]["nombre"]):
         nuevos_precios[key] = st.number_input(
             t["nombre"], min_value=0, step=1000,
             value=int(terapias_actuales[key]["precio"]),

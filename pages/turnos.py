@@ -45,7 +45,7 @@ def reiniciar():
 # ---------- Paso 1: elegir terapia ----------
 if st.session_state.step == 1:
     st.markdown('<h2>Seleccioná tu terapia</h2>', unsafe_allow_html=True)
-    for key, t in TERAPIAS.items():
+    for key, t in sorted(TERAPIAS.items(), key=lambda kv: kv[1]["nombre"]):
         with st.container(border=True):
             c1, c2 = st.columns([3, 1])
             with c1:

@@ -63,7 +63,7 @@ TERAPIAS = {
         ),
     },
     "habitarme": {
-        "nombre": "Programa Habitarme",
+        "nombre": "Habitarme",
         "grupo": GRUPO_MEET,
         "duracion_min": 60,
         "precio": 40000,
