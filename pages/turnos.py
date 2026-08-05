@@ -8,6 +8,7 @@ from config_terapias import (
 from services.slots import generar_turnos_disponibles, agrupar_por_dia
 from services.bootstrap import get_backends
 from services.config_loader import cargar_terapias_y_pago
+from services.precios import precio_usd, formatear_usd
 from services.secrets_utils import to_dict
 
 DIAS_ES = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
@@ -50,8 +51,9 @@ if st.session_state.step == 1:
             with c1:
                 st.markdown(f'<p class="terapia-nombre">{t["nombre"]}</p>', unsafe_allow_html=True)
                 precio_fmt = f"{t['precio']:,.0f}".replace(",", ".")
+                usd_fmt = formatear_usd(precio_usd(t["precio"]))
                 st.markdown(
-                    f'<p class="terapia-detalle">Duración: {t["duracion_min"]} min · Precio: ${precio_fmt}</p>',
+                    f'<p class="terapia-detalle">Duración: {t["duracion_min"]} min · Precio: ${precio_fmt} ({usd_fmt})</p>',
                     unsafe_allow_html=True,
                 )
             with c2:
@@ -142,7 +144,10 @@ elif st.session_state.step == 4:
     st.write(f"**Día:** {formatear_fecha(inicio.date())}")
     st.write(f"**Horario:** {formatear_hora(inicio)} a {formatear_hora(fin)}")
     st.write(f"**Nombre:** {st.session_state.nombre}")
-    st.write(f"**Precio:** ${terapia['precio']:,.0f}".replace(",", "."))
+    st.write(
+        f"**Precio:** ${terapia['precio']:,.0f}".replace(",", ".")
+        + f" ({formatear_usd(precio_usd(terapia['precio']))})"
+    )
 
     col_a, col_b = st.columns(2)
     with col_a:
@@ -207,7 +212,10 @@ elif st.session_state.step == 5:
     st.warning(POLITICA_CANCELACION)
 
     st.subheader("Datos para la seña (50%)")
-    st.write(f"**Monto a transferir:** ${sena:,.0f}".replace(",", "."))
+    st.write(
+        f"**Monto a transferir:** ${sena:,.0f}".replace(",", ".")
+        + f" ({formatear_usd(precio_usd(sena))})"
+    )
     st.write(f"**Alias:** {DATOS_PAGO['alias']}")
     st.write(f"**Banco:** {DATOS_PAGO['banco']}")
     st.caption(DATOS_PAGO["nota_exterior"])
