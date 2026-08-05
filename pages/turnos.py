@@ -67,10 +67,13 @@ elif st.session_state.step == 2:
     st.header(f"Elegí día y horario – {terapia['nombre']}")
 
     if terapia_key == "habitarme":
-        st.info(
+        st.markdown(
+            '<div class="aviso-lila">'
             "Recordá que Habitarme es un programa a largo plazo: podés abonar por sesión, "
             "por mes o el programa completo. Si abonás esta sesión y más adelante decidís "
             "pagar todo junto, no te preocupes — descontamos lo ya abonado del total."
+            "</div>",
+            unsafe_allow_html=True,
         )
 
     ahora = datetime.now()

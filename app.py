@@ -37,6 +37,15 @@ st.markdown(
         padding: 0.3rem 1.1rem;
     }
     div.stButton > button:hover { background-color: #6B4E7D; color: white; }
+    .aviso-lila {
+        background-color: #F0E6F6;
+        border-left: 4px solid #8E6FA1;
+        color: #4A3B57;
+        border-radius: 6px;
+        padding: 0.8rem 1rem;
+        margin-bottom: 0.8rem;
+        font-size: 0.9rem;
+    }
     </style>
     """,
     unsafe_allow_html=True,
