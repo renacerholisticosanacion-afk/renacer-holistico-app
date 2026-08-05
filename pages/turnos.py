@@ -66,6 +66,13 @@ elif st.session_state.step == 2:
     terapia = TERAPIAS[terapia_key]
     st.header(f"Elegí día y horario – {terapia['nombre']}")
 
+    if terapia_key == "habitarme":
+        st.info(
+            "Recordá que Habitarme es un programa a largo plazo: podés abonar por sesión, "
+            "por mes o el programa completo. Si abonás esta sesión y más adelante decidís "
+            "pagar todo junto, no te preocupes — descontamos lo ya abonado del total."
+        )
+
     ahora = datetime.now()
     desde = ahora
     hasta = ahora + timedelta(days=HORIZONTE_DIAS + terapia["min_dias"] + 2)

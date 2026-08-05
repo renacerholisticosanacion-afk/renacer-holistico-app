@@ -36,6 +36,8 @@ TERAPIAS = {
         "min_dias": 2,
         "mensaje_confirmacion": (
             "Unos minutos antes de tu sesión te voy a escribir para avisarte que comienzo. "
+            "Necesito que completes lo antes posible este form para preparar tu sesión: "
+            "https://docs.google.com/forms/d/e/1FAIpQLSf9vkdWO9hwWiMfn8ULWHREkU3CLgS1uy6WuHYfKE9xyMzg7A/viewform?usp=header "
             "Dentro de las 24 hs siguientes vas a recibir un informe escrito."
         ),
     },
@@ -57,7 +59,8 @@ TERAPIAS = {
         "min_dias": 7,
         "mensaje_confirmacion": (
             "Unos minutos antes de tu sesión te voy a contactar para enviarte el link de Meet. "
-            "Antes de la sesión vas a recibir un formulario para completar."
+            "Necesito que completes lo antes posible este form para preparar tu sesión: "
+            "https://docs.google.com/forms/d/e/1FAIpQLSfTQpt2d_ZNhkjuU0f4IHrUIZncqU6XRDBRVgVuNPNr_Bu2Jw/viewform?usp=header"
         ),
     },
     "carta_numerologica": {
