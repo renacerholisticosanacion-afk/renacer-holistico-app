@@ -10,4 +10,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Ping app to prevent it from sleeping
-        run: curl -sSf --retry 3 --retry-delay 10 "https://renacer-holistico-app-n54wecxvecthschqc5cr8i.streamlit.app/" -o /dev/null
+        run: curl -sSf --retry 3 --retry-delay 10 "https://renacer-holistico-app-aqwcsyvq5xpzdbq5gmwxdy.streamlit.app/" -o /dev/null

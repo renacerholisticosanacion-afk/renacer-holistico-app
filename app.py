@@ -56,11 +56,19 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-pages = [
-    st.Page("pages/home.py", title="Inicio", icon="🏠", default=True),
-    st.Page("pages/turnos.py", title="Turnos", icon="🗓️"),
-    st.Page("pages/productos.py", title="Productos", icon="🛍️"),
-    st.Page("pages/admin.py", title="Admin", url_path="admin", visibility="hidden"),
-]
+# Inicio y Productos siguen en construccion: solo se muestran despues de ingresar en /admin.
+# Al no estar en la lista para el publico, tampoco se pueden abrir escribiendo la URL.
+if st.session_state.get("admin_ok"):
+    pages = [
+        st.Page("pages/home.py", title="Inicio", icon="🏠", default=True),
+        st.Page("pages/turnos.py", title="Turnos", icon="🗓️"),
+        st.Page("pages/productos.py", title="Productos", icon="🛍️"),
+        st.Page("pages/admin.py", title="Admin", url_path="admin", visibility="hidden"),
+    ]
+else:
+    pages = [
+        st.Page("pages/turnos.py", title="Turnos", icon="🗓️", default=True),
+        st.Page("pages/admin.py", title="Admin", url_path="admin", visibility="hidden"),
+    ]
 
 st.navigation(pages, position="top").run()
